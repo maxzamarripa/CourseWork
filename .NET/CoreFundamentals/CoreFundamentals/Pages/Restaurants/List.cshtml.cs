@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CoreFundamentals.Core;
 using CoreFundamentals.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,23 +9,24 @@ namespace CoreFundamentals.Pages.Restaurants
 {
     public class ListModel : PageModel
     {
-        private readonly IConfiguration config;
-        private readonly IRestaurantData restaurantData;
-
+        private readonly IConfiguration _config;
+        private readonly IRestaurantData _restaurantData;
         public string Message { get; set; }
         public IEnumerable<Restaurant> Restaurants { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string SearchTerm { get; set; }
 
-        public ListModel(IConfiguration _config, 
-                         IRestaurantData _restaurantData)
+        public ListModel(IConfiguration config, 
+                         IRestaurantData restaurantData)
         {
-            config = _config;
-            restaurantData = _restaurantData;
+            _config = config;
+            _restaurantData = restaurantData;
         }
 
         public void OnGet()
         {
-            Message = config["Message"];
-            Restaurants = restaurantData.GetAll();
+            Message = _config["Message"];
+            Restaurants = _restaurantData.GetRestaurantsByName(SearchTerm);
         }
     }
 }
