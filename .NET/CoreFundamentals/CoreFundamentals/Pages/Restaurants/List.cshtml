@@ -7,8 +7,8 @@
 <h1>Restaurants</h1>
 
 <form method="get">
-    <div class="form-group">
-        <div class="input-group">
+    <section class="form-group">
+        <section class="input-group">
             <input type="search" class="form-group" 
                    asp-for="SearchTerm"/>
             <span class="input-group-btn">
@@ -17,8 +17,8 @@
                     Seach
                 </button>
             </span>
-        </div>
-    </div>
+        </section>
+    </section>
 </form>
 
 <table class="table">
@@ -30,14 +30,25 @@
             <td>@restaurant.Cuisine</td>
             <td>
                 <a class="btn btn-lg"
-                   asp-page="./Detail" 
+                   asp-page="./Detail"
                    asp-route-restaurantId="@restaurant.Id">
-                    <i class="glyphicon glyphicon-zoom-in"></i> 
+                    <i class="glyphicon glyphicon-zoom-in"></i>
                     Details
+                </a>
+                <a class="btn btn-lg"
+                   asp-page="./Edit"
+                   asp-route-restaurantId="@restaurant.Id">
+                    <i class="glyphicon glyphicon-edit"></i>
+                    Edit
                 </a>
             </td>
         </tr>    
     }
 </table>
+
+<a class="btn btn-primary"
+   asp-page="./Edit" >
+    Create a Restaurant
+</a>
 
 <p>@Model.Message</p>
