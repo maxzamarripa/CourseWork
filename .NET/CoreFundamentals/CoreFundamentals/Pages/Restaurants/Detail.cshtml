@@ -5,8 +5,14 @@
     ViewData["Title"] = "Detail";
 }
 
-    <h1>Detail</h1>
-    <h2>@Model.Restaurant.Name</h2>
+<h1>Detail</h1>
+<h2>@Model.Restaurant.Name</h2>
+
+@if (Model.Message != null)
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
 <section>
     Id: @Model.Restaurant.Id
 </section>

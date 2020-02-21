@@ -8,6 +8,9 @@ namespace CoreFundamentals.Data
     {
         IEnumerable<Restaurant> GetRestaurantsByName(string name);
         Restaurant GetById(int id);
+        Restaurant Update(Restaurant updatedRestaurant);
+        Restaurant Create(Restaurant newRestaurant);
+        int Commit();
     }
 
     public class InMemoryRestaurantData : IRestaurantData
@@ -42,6 +45,18 @@ namespace CoreFundamentals.Data
             };
         }
 
+        public int Commit()
+        {
+            return 0;
+        }
+
+        public Restaurant Create(Restaurant newRestaurant)
+        {
+            newRestaurant.Id = restaurants.Max(r => r.Id) + 1;
+            restaurants.Add(newRestaurant);
+            return newRestaurant;
+        }
+
         public Restaurant GetById(int id)
         {
             return restaurants.SingleOrDefault(r => r.Id == id);
@@ -53,6 +68,18 @@ namespace CoreFundamentals.Data
                    where string.IsNullOrEmpty(name) || r.Name.StartsWith(name)
                    orderby r.Name
                    select r;
+        }
+
+        public Restaurant Update(Restaurant updatedRestaurant)
+        {
+            var restaurant = restaurants.SingleOrDefault(r => r.Id == updatedRestaurant.Id);
+            if(restaurant != null)
+            {
+                restaurant.Name = updatedRestaurant.Name;
+                restaurant.Location = updatedRestaurant.Location;
+                restaurant.Cuisine = updatedRestaurant.Cuisine; 
+            }
+            return restaurant;
         }
     }
 }
