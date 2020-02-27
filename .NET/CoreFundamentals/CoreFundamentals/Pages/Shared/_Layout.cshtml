@@ -40,7 +40,9 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
+            <vc:restaurant-count></vc:restaurant-count>
             &copy; 2020 - CoreFundamentals - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            @RenderSection("footer", required: false)
         </div>
     </footer>
 
