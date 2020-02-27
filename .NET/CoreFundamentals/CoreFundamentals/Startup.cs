@@ -37,6 +37,7 @@ namespace CoreFundamentals
             services.AddScoped<IRestaurantData, SqlRestaurantData>();
 
             services.AddRazorPages();
+            services.AddConnections();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +56,7 @@ namespace CoreFundamentals
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseNodeModules();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -63,6 +64,7 @@ namespace CoreFundamentals
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }
