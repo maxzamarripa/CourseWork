@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreFundamentals.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,9 @@ namespace CoreFundamentals
                 app.UseHsts();
             }
 
+            //Custome middleware
+            app.Use(SeyHelloMiddleware);
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseNodeModules();
@@ -66,6 +70,21 @@ namespace CoreFundamentals
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
+        }
+
+        private RequestDelegate SeyHelloMiddleware(RequestDelegate next)
+        {
+            return async ctx =>
+            {
+                if (ctx.Request.Path.StartsWithSegments("/hello"))
+                {
+                    await ctx.Response.WriteAsync("Hello world!");
+                } 
+                else
+                {
+                    await next(ctx);
+                }
+            };
         }
     }
 }
