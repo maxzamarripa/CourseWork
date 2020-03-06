@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20200304215346_PiePrice-UPDATE.Designer.cs" />
     <Compile Remove="Migrations\20200304215635_PiePrice-UPDATE.cs" />
     <Compile Remove="Migrations\20200304215635_PiePrice-UPDATE.Designer.cs" />
+    <Compile Remove="Migrations\20200306230521_ShoppingCartItem_ADD.cs" />
+    <Compile Remove="Migrations\20200306230521_ShoppingCartItem_ADD.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
