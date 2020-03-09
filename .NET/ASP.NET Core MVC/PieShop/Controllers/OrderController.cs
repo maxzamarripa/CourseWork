@@ -22,6 +22,33 @@ namespace PieShop.Controllers
         // GET: /<controller>/
         public IActionResult Checkout()
         {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Checkout(Order order)
+        {
+            var items = shoppingCart.GetShoppingCartItems();
+            shoppingCart.ShoppingCartItems = items;
+
+            if(shoppingCart.ShoppingCartItems.Count == 0)
+            {
+                ModelState.AddModelError("", "Your cart is empty, add some pies first");
+            }
+
+            if (ModelState.IsValid)
+            {
+                orderRepository.CreateOrder(order);
+                shoppingCart.ClearCart();
+                return RedirectToAction("CheckoutComplete");
+            }
+
+            return View(order);
+        }
+
+        public IActionResult CheckoutComplete()
+        {
+            ViewBag.CheckoutCompleteMessage = "Thanks for your order.";
 
             return View();
         }
