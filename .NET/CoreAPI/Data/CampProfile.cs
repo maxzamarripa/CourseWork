@@ -15,6 +15,8 @@ namespace CoreAPI.Data
                 .ForMember(c => c.Venue, o => o.MapFrom(m => m.Location.VenueName));
 
             CreateMap<Talk, TalkModel>();
+
+            CreateMap<Speaker, SpeakerModel>();
         }
     }
 }
