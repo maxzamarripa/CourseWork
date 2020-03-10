@@ -24,19 +24,19 @@ namespace CoreAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(bool includeTalks = false)
         {
             try
             {
-                var result = await campRepository.GetAllCampsAsync();
+                var result = await campRepository.GetAllCampsAsync(includeTalks);
 
-                List<CampModel> models = mapper.Map<List<CampModel>>(result);
+                CampModel[] models = mapper.Map<CampModel[]>(result);
 
                 return Ok(models);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
 
