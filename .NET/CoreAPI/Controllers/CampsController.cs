@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CoreAPI.Data;
 using CoreAPI.Models;
 using Microsoft.AspNetCore.Http;
@@ -14,10 +15,12 @@ namespace CoreAPI.Controllers
     public class CampsController : ControllerBase
     {
         private readonly ICampRepository campRepository;
+        private readonly IMapper mapper;
 
-        public CampsController(ICampRepository campRepository)
+        public CampsController(ICampRepository campRepository, IMapper mapper)
         {
             this.campRepository = campRepository;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -27,9 +30,9 @@ namespace CoreAPI.Controllers
             {
                 var result = await campRepository.GetAllCampsAsync();
 
-                List<CampModel> models = 
+                List<CampModel> models = mapper.Map<List<CampModel>>(result);
 
-                return Ok(result);
+                return Ok(models);
             }
             catch (Exception)
             {
