@@ -61,5 +61,27 @@ namespace CoreAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchByDate(DateTime date, bool includeTalks = false)
+        {
+            try
+            {
+                var results = await campRepository.GetAllCampsByEventDate(date, includeTalks);
+
+                if (!results.Any())
+                {
+                    return NotFound();
+                }
+
+                var response = mapper.Map<CampModel[]>(results);
+
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
     }
 }
