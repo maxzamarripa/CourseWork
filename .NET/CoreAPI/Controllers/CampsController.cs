@@ -87,26 +87,86 @@ namespace CoreAPI.Controllers
             }
         }
 
+        //TODO: Fix this action probably a Mapper issue
         [HttpPost]
         public async Task<IActionResult> Post(CampModel model)
         {
             try
             {
-                var location = linkGenerator.GetPathByAction("Get", "Camps", new { moniker = model.Moniker });
+                //Check duplicate external identifier
+                var existing = await campRepository.GetCampAsync(model.Moniker);
+                if(existing != null)
+                {
+                    return BadRequest("Moniker in use!");
+                }
 
+                var location = linkGenerator.GetPathByAction("Get", "Camps", new { moniker = model.Moniker });
                 if (string.IsNullOrWhiteSpace(location))
                 {
                     return BadRequest("Cannot use current moniker");
                 }
 
                 //Add new camp
-                var camp = mapper.Map<Camp>(model);
+                var newCamp = mapper.Map<Camp>(model);
 
-                campRepository.Add(camp);
+                campRepository.Add(newCamp);
 
                 if (await campRepository.SaveChangesAsync())
                 {
-                    return Created(location, mapper.Map<CampModel>(camp));
+                    return Created(location, mapper.Map<CampModel>(newCamp));
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+
+            return BadRequest();
+        }
+
+        //TODO: Fix this action probably a Mapper issue
+        [HttpPut("{moniker}")]
+        public async Task<IActionResult> Put(string moniker, CampModel model)
+        {
+            try
+            {
+                var oldCamp = campRepository.GetCampAsync(moniker);
+                if(oldCamp == null)
+                {
+                    return NotFound($"Could not find camp with moniker of {moniker}");
+                }
+
+                await mapper.Map(model, oldCamp);
+
+                if(await campRepository.SaveChangesAsync())
+                {
+                    return Ok(mapper.Map<CampModel>(oldCamp));
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{moniker}")]
+        public async Task<IActionResult> Delete(string moniker)
+        {
+            try
+            {
+                var oldCamp = campRepository.GetCampAsync(moniker);
+                if (oldCamp == null)
+                {
+                    return NotFound($"Could not find camp with moniker of {moniker}");
+                }
+
+                campRepository.Delete(oldCamp);
+
+                if (await campRepository.SaveChangesAsync())
+                {
+                    return Ok();
                 }
             }
             catch (Exception)
