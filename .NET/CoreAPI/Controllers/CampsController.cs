@@ -7,6 +7,7 @@ using CoreAPI.Data;
 using CoreAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace CoreAPI.Controllers
 {
@@ -16,11 +17,13 @@ namespace CoreAPI.Controllers
     {
         private readonly ICampRepository campRepository;
         private readonly IMapper mapper;
+        private readonly LinkGenerator linkGenerator;
 
-        public CampsController(ICampRepository campRepository, IMapper mapper)
+        public CampsController(ICampRepository campRepository, IMapper mapper, LinkGenerator linkGenerator)
         {
             this.campRepository = campRepository;
             this.mapper = mapper;
+            this.linkGenerator = linkGenerator;
         }
 
         [HttpGet]
@@ -82,6 +85,36 @@ namespace CoreAPI.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(CampModel model)
+        {
+            try
+            {
+                var location = linkGenerator.GetPathByAction("Get", "Camps", new { moniker = model.Moniker });
+
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    return BadRequest("Cannot use current moniker");
+                }
+
+                //Add new camp
+                var camp = mapper.Map<Camp>(model);
+
+                campRepository.Add(camp);
+
+                if (await campRepository.SaveChangesAsync())
+                {
+                    return Created(location, mapper.Map<CampModel>(camp));
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+
+            return BadRequest();
         }
     }
 }
