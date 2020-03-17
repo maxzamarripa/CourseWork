@@ -160,6 +160,16 @@ namespace CoreAPI.Controllers
                     return NotFound($"Could not find camp with moniker of {moniker}");
                 }
 
+                //Delete related talks
+                var talks = campRepository.GetTalksByMonikerAsync(moniker).Result;
+                if (talks != null && talks.Any())
+                {
+                    foreach(var talk in talks)
+                    {
+                        campRepository.Delete(talk);
+                    }
+                }
+
                 campRepository.Delete(oldCamp);
 
                 if (await campRepository.SaveChangesAsync())
