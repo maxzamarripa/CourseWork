@@ -44,11 +44,11 @@ namespace CoreAPI.Controllers
         }
 
         [HttpGet("{moniker}")]
-        public async Task<IActionResult> Get(string moniker)
+        public async Task<IActionResult> Get(string moniker, bool includeTalks = false)
         {
             try
             {
-                var result = await campRepository.GetCampAsync(moniker);
+                var result = await campRepository.GetCampAsync(moniker, includeTalks);
 
                 if (result == null)
                 {
