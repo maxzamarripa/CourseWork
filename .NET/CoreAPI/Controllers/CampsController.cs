@@ -87,7 +87,6 @@ namespace CoreAPI.Controllers
             }
         }
 
-        //TODO: Fix this action probably a Mapper issue
         [HttpPost]
         public async Task<IActionResult> Post(CampModel model)
         {
@@ -124,7 +123,6 @@ namespace CoreAPI.Controllers
             return BadRequest();
         }
 
-        //TODO: Fix this action probably a Mapper issue
         [HttpPut("{moniker}")]
         public async Task<IActionResult> Put(string moniker, CampModel model)
         {
