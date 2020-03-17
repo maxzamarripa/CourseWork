@@ -47,5 +47,72 @@ namespace CoreAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> Get(string moniker, int id)
+        {
+            try
+            {
+                var talk = await campRepository.GetTalkByMonikerAsync(moniker, id);
+
+                if (talk == null)
+                {
+                    return NotFound();
+                }
+
+                var response = mapper.Map<TalkModel>(talk);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(string moniker, TalkModel model)
+        {
+            try
+            {
+                //Get camp
+                var camp = await campRepository.GetCampAsync(moniker, true);
+                if (camp == null)
+                {
+                    return BadRequest("Camp does not exists!");
+                }
+
+                //Check duplicate Title
+                var existing = camp.Talks;
+                if (existing != null && existing.Any(t => t.Title == model.Title))
+                {
+                    return BadRequest("You already have a talk with that Title!");
+                }
+
+                //Map talk to entity 
+                var talk = mapper.Map<Talk>(model);
+                //confirm association
+                talk.Camp = camp;
+
+                campRepository.Add(talk);
+
+                if (await campRepository.SaveChangesAsync())
+                {
+                    var url = linkGenerator.GetPathByAction(
+                        HttpContext, 
+                        "Get", 
+                        values: new { moniker, id = talk.TalkId });
+
+                    return Created(url, mapper.Map<TalkModel>(talk));
+                } else
+                {
+                    return BadRequest("Failed to add Talk");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
+            }
+        }
     }
 }
