@@ -11,12 +11,16 @@ namespace CoreAPI.Data
     {
         public CampProfile()
         {
-            CreateMap<Camp, CampModel>()
-                .ForMember(c => c.Venue, o => o.MapFrom(m => m.Location.VenueName));
-
+            CreateMap<Camp, CampModel>();
             CreateMap<Talk, TalkModel>();
-
             CreateMap<Speaker, SpeakerModel>();
+            CreateMap<Location, LocationModel>();
+
+            //For post operation
+            CreateMap<CampModel, Camp>();
+            CreateMap<TalkModel, Talk>();
+            CreateMap<SpeakerModel, Speaker>();
+            CreateMap<LocationModel, Location>();
         }
     }
 }

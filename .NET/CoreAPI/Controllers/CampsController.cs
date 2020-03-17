@@ -59,9 +59,9 @@ namespace CoreAPI.Controllers
 
                 return Ok(response);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
 
@@ -81,9 +81,9 @@ namespace CoreAPI.Controllers
 
                 return Ok(response);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
 
@@ -116,9 +116,9 @@ namespace CoreAPI.Controllers
                     return Created(location, mapper.Map<CampModel>(newCamp));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
@@ -130,22 +130,22 @@ namespace CoreAPI.Controllers
         {
             try
             {
-                var oldCamp = campRepository.GetCampAsync(moniker);
+                var oldCamp = campRepository.GetCampAsync(moniker).Result;
                 if(oldCamp == null)
                 {
                     return NotFound($"Could not find camp with moniker of {moniker}");
                 }
 
-                await mapper.Map(model, oldCamp);
+                mapper.Map(model, oldCamp);
 
                 if(await campRepository.SaveChangesAsync())
                 {
                     return Ok(mapper.Map<CampModel>(oldCamp));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
@@ -156,7 +156,7 @@ namespace CoreAPI.Controllers
         {
             try
             {
-                var oldCamp = campRepository.GetCampAsync(moniker);
+                var oldCamp = campRepository.GetCampAsync(moniker).Result;
                 if (oldCamp == null)
                 {
                     return NotFound($"Could not find camp with moniker of {moniker}");
@@ -169,9 +169,9 @@ namespace CoreAPI.Controllers
                     return Ok();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
