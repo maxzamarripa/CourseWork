@@ -11,16 +11,14 @@ namespace CoreAPI.Data
     {
         public CampProfile()
         {
-            CreateMap<Camp, CampModel>();
-            CreateMap<Talk, TalkModel>();
-            CreateMap<Speaker, SpeakerModel>();
-            CreateMap<Location, LocationModel>();
-
-            //For post operation
-            CreateMap<CampModel, Camp>();
-            CreateMap<TalkModel, Talk>();
-            CreateMap<SpeakerModel, Speaker>();
-            CreateMap<LocationModel, Location>();
+            CreateMap<Camp, CampModel>()
+                .ReverseMap();
+            CreateMap<Talk, TalkModel>()
+                .ReverseMap();
+            CreateMap<Speaker, SpeakerModel>()
+                .ReverseMap();
+            CreateMap<Location, LocationModel>()
+                .ReverseMap();
         }
     }
 }
