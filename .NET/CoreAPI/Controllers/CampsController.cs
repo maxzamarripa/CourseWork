@@ -44,11 +44,11 @@ namespace CoreAPI.Controllers
         }
 
         [HttpGet("{moniker}")]
-        public async Task<IActionResult> Get(string moniker)
+        public async Task<IActionResult> Get(string moniker, bool includeTalks = false)
         {
             try
             {
-                var result = await campRepository.GetCampAsync(moniker);
+                var result = await campRepository.GetCampAsync(moniker, includeTalks);
 
                 if (result == null)
                 {
@@ -59,9 +59,9 @@ namespace CoreAPI.Controllers
 
                 return Ok(response);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
 
@@ -81,13 +81,12 @@ namespace CoreAPI.Controllers
 
                 return Ok(response);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
 
-        //TODO: Fix this action probably a Mapper issue
         [HttpPost]
         public async Task<IActionResult> Post(CampModel model)
         {
@@ -116,36 +115,35 @@ namespace CoreAPI.Controllers
                     return Created(location, mapper.Map<CampModel>(newCamp));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
         }
 
-        //TODO: Fix this action probably a Mapper issue
         [HttpPut("{moniker}")]
         public async Task<IActionResult> Put(string moniker, CampModel model)
         {
             try
             {
-                var oldCamp = campRepository.GetCampAsync(moniker);
+                var oldCamp = campRepository.GetCampAsync(moniker).Result;
                 if(oldCamp == null)
                 {
                     return NotFound($"Could not find camp with moniker of {moniker}");
                 }
 
-                await mapper.Map(model, oldCamp);
+                mapper.Map(model, oldCamp);
 
                 if(await campRepository.SaveChangesAsync())
                 {
                     return Ok(mapper.Map<CampModel>(oldCamp));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
@@ -156,10 +154,20 @@ namespace CoreAPI.Controllers
         {
             try
             {
-                var oldCamp = campRepository.GetCampAsync(moniker);
+                var oldCamp = campRepository.GetCampAsync(moniker).Result;
                 if (oldCamp == null)
                 {
                     return NotFound($"Could not find camp with moniker of {moniker}");
+                }
+
+                //Delete related talks
+                var talks = campRepository.GetTalksByMonikerAsync(moniker).Result;
+                if (talks != null && talks.Any())
+                {
+                    foreach(var talk in talks)
+                    {
+                        campRepository.Delete(talk);
+                    }
                 }
 
                 campRepository.Delete(oldCamp);
@@ -169,9 +177,9 @@ namespace CoreAPI.Controllers
                     return Ok();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
 
             return BadRequest();
