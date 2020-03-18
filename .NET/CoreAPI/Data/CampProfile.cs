@@ -13,10 +13,16 @@ namespace CoreAPI.Data
         {
             CreateMap<Camp, CampModel>()
                 .ReverseMap();
+
             CreateMap<Talk, TalkModel>()
-                .ReverseMap();
+                .ReverseMap()
+                //this needs to be done after ReverseMap()
+                .ForMember(t => t.Camp, opt => opt.Ignore())
+                .ForMember(t => t.Speaker, opt => opt.Ignore());
+
             CreateMap<Speaker, SpeakerModel>()
                 .ReverseMap();
+
             CreateMap<Location, LocationModel>()
                 .ReverseMap();
         }
