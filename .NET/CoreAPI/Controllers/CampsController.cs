@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Routing;
 namespace CoreAPI.Controllers
 {
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
     [ApiController]
     public class CampsController : ControllerBase
     {
@@ -44,11 +46,35 @@ namespace CoreAPI.Controllers
         }
 
         [HttpGet("{moniker}")]
+        [MapToApiVersion("1.0")]
         public async Task<IActionResult> Get(string moniker, bool includeTalks = false)
         {
             try
             {
                 var result = await campRepository.GetCampAsync(moniker, includeTalks);
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                var response = mapper.Map<CampModel>(result);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
+            }
+        }
+
+        [HttpGet("{moniker}")]
+        [MapToApiVersion("1.1")]
+        public async Task<IActionResult> GetV1_1(string moniker)
+        {
+            try
+            {
+                var result = await campRepository.GetCampAsync(moniker, true);
 
                 if (result == null)
                 {
