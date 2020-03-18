@@ -36,6 +36,13 @@ namespace CoreAPI
             });
 
             IMapper mapper = mappingConfig.CreateMapper();
+
+            services.AddApiVersioning(opt => 
+            {
+                opt.DefaultApiVersion = new ApiVersion(1, 1);
+                opt.ReportApiVersions = true;
+            });
+
             services.AddSingleton(mapper);
 
             services.AddControllers().AddNewtonsoftJson(options => 
