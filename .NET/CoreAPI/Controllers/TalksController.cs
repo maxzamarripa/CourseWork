@@ -114,5 +114,57 @@ namespace CoreAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
             }
         }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Put(string moniker, int id, TalkModel model)
+        {
+            try
+            {
+                var oldtalk = campRepository.GetTalkByMonikerAsync(moniker, id, true).Result;
+                if (oldtalk == null)
+                {
+                    return NotFound($"Could not find camp with moniker of {moniker}");
+                }
+
+                mapper.Map(model, oldtalk);
+
+                if (await campRepository.SaveChangesAsync())
+                {
+                    return Ok(mapper.Map<TalkModel>(oldtalk));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(string moniker, int id)
+        {
+            try
+            {
+                var oldtalk = campRepository.GetTalkByMonikerAsync(moniker, id).Result;
+                if (oldtalk == null)
+                {
+                    return NotFound($"Could not find Talk with moniker of {moniker} and id of {id}");
+                }
+
+                campRepository.Delete(oldtalk);
+
+                if (await campRepository.SaveChangesAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message + ex.InnerException?.Message);
+            }
+
+            return BadRequest();
+        }
     }
 }
